@@ -1,0 +1,8 @@
+{
+  "name": "library",
+  "main": "dist/library.js",
+  "dependencies": {
+    "jquery": "^2.0.0"
+  },
+  "devDependencies": {}
+}
