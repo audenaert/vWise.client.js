@@ -1,14 +1,11 @@
 {
-  "name": "library",
+  "name": "vwise",
   "version": "0.0.0",
-  "description": "A library boilerplate using ES6 (babel), eslint, gulp, karma",
+  "description": "in-browser panels-based workspace with support for custom content providers and rendering",
   "keywords": [
-    "library",
-    "es6",
-    "es2015",
-    "babel",
-    "gulp",
-    "karma"
+    "vwise",
+    "panel",
+    "workspace"
   ],
   "license": "Apache-2.0",
   "dependencies": {},
@@ -47,6 +44,6 @@
     "wiredep": "^4.0.0"
   },
   "engines": {
-    "node": "~5.7.0"
+    "node": ">=5.7.0 <7.0.0"
   }
 }

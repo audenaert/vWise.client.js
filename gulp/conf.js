@@ -11,8 +11,8 @@ exports.paths = {
 exports.mainFile = 'index.js';
 
 exports.output = {
-  library: 'library',
-  filename: 'library.js'
+  library: 'vwise',
+  filename: 'vwise.js'
 };
 
 exports.dependencies = [

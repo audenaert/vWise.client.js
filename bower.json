@@ -1,6 +1,6 @@
 {
-  "name": "library",
-  "main": "dist/library.js",
+  "name": "vwise",
+  "main": "dist/vwise.js",
   "dependencies": {
     "jquery": "^2.0.0"
   },
