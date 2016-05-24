@@ -1,4 +1,4 @@
-import { PanelRegistry } from './panel-registry';
+import { PanelRegistry } from './panel-type-registry';
 import { expect } from 'chai';
 
 describe('PanelRegistry', function () {

@@ -1,8 +1,8 @@
-import { PanelRegistration } from './panel-registration';
+import { PanelType } from './panel-type';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-describe('PanelRegistration', function () {
+describe('PanelType', function () {
   describe('#constructor', function () {
     it('should properly populate fields', function () {
       let def = {
@@ -16,7 +16,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      let reg = new PanelRegistration(def);
+      let reg = new PanelType(def);
 
       reg.id.should.equal(def.id);
       reg.typeId.should.equal(def.typeId);
@@ -34,7 +34,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      let reg = new PanelRegistration(def);
+      let reg = new PanelType(def);
 
       reg.title.should.equal(def.typeId);
       reg.description.should.equal('');
@@ -43,7 +43,7 @@ describe('PanelRegistration', function () {
     });
 
     it('should throw an error if an invalid definition is provided', function () {
-      (() => new PanelRegistration({})).should.throw();
+      (() => new PanelType({})).should.throw();
     });
   });
 
@@ -57,7 +57,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      let reg = new PanelRegistration(def);
+      let reg = new PanelType(def);
       reg.matches();
 
       expect(callback.called).to.be.true;
@@ -74,14 +74,14 @@ describe('PanelRegistration', function () {
         initPanelData: callback
       };
 
-      let reg = new PanelRegistration(def);
+      let reg = new PanelType(def);
       reg.initPanelData();
 
       expect(callback.called).to.be.true;
     });
   });
 
-  describe('static #validatePanelDefinition', function () {
+  describe('static #validatePanelTypeDefinition', function () {
     it('should validate a proper panel definition', function () {
       let def = {
         id: 'test',
@@ -90,7 +90,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.true;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.true;
     });
 
     it('should mark a panel definition without an id as invalid', function () {
@@ -100,7 +100,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.false;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.false;
     });
 
     it('should mark a panel definition without a typeId as invalid', function () {
@@ -110,7 +110,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.false;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.false;
     });
 
     it('should mark a panel definition without a matches callback as invalid', function () {
@@ -120,7 +120,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.false;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.false;
     });
 
     it('should mark a panel definition with a non-callable matches callback as invalid', function () {
@@ -131,7 +131,7 @@ describe('PanelRegistration', function () {
         initPanelData: noop
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.false;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.false;
     });
 
     it('should mark a panel definition without an initPanelData callback as invalid', function () {
@@ -141,7 +141,7 @@ describe('PanelRegistration', function () {
         matches: noop
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.false;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.false;
     });
 
     it('should mark a panel definition with a non-callable initPanelData callback as invalid', function () {
@@ -152,7 +152,7 @@ describe('PanelRegistration', function () {
         initPanelData: 5
       };
 
-      expect(PanelRegistration.validatePanelDefinition(def)).to.be.false;
+      expect(PanelType.validatePanelTypeDefinition(def)).to.be.false;
     });
   });
 });

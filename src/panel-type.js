@@ -1,12 +1,12 @@
 // @flow
 
-/*:: import type { PanelDefinition } from './panel-definition';*/
+/*:: import type { PanelTypeDefinition } from './panel-type-definition';*/
 
 /**
- * A thin class wrapper around a {@link PanelDefinition} object.
+ * A thin class wrapper around a {@link PanelTypeDefinition} object.
  */
-class PanelRegistration {
-  /*:: _def: PanelDefinition;*/
+class PanelType {
+  /*:: _def: PanelTypeDefinition;*/
   /*:: id: string;*/
   /*:: typeId: string;*/
   /*:: title: string;*/
@@ -15,16 +15,16 @@ class PanelRegistration {
   /*:: contentType: string;*/
 
   /**
-   * @param {PanelDefinition} panelDefn
+   * @param {PanelTypeDefinition} panelDefn
    */
-  constructor(panelDefn/*: PanelDefinition*/) {
-    if (!PanelRegistration.validatePanelDefinition(panelDefn)) {
+  constructor(panelDefn/*: PanelTypeDefinition*/) {
+    if (!PanelType.validatePanelTypeDefinition(panelDefn)) {
       throw new Error('Invalid panel definition');
     }
 
     /**
      * @private
-     * @type {PanelDefinition}
+     * @type {PanelTypeDefinition}
      */
     this._def = panelDefn;
 
@@ -48,7 +48,7 @@ class PanelRegistration {
   }
 
   /**
-   * Delegates to {@link PanelDefinition#matches}
+   * Delegates to {@link PanelTypeDefinition#matches}
    * @param {Object} item
    * @param {Object} ctx
    * @return {boolean}
@@ -58,7 +58,7 @@ class PanelRegistration {
   }
 
   /**
-   * Delegates to {@link PanelDefinition#initPanelData}
+   * Delegates to {@link PanelTypeDefinition#initPanelData}
    * @return {Object}
    */
   initPanelData(item/*: any*/, ctx/*: Object*/)/*: void*/ {
@@ -66,10 +66,28 @@ class PanelRegistration {
   }
 
   /**
+   * Converts serialized panel content into a simple JS object
+   * @param  {string} content
+   * @return {Object}
+   */
+  parseContent(content/*: string*/)/*: Object*/ {
+    return this._def.parseContent ? this._def.parseContent(content) : JSON.parse(content);
+  }
+
+  /**
+   * Converts panel content into a serialized string for serialization
+   * @param  {Object} obj
+   * @return {string}
+   */
+  formatContent(obj/*: Object*/)/*: string*/ {
+    return this._def.formatContent ? this._def.formatContent(obj) : JSON.stringify(obj || {});
+  }
+
+  /**
    * Validates the given panel definition for the minimum required fields.
    * @return {boolean} true if the panel definition is valid; and false otherwise.
    */
-  static validatePanelDefinition(def/*: PanelDefinition*/)/*: boolean*/ {
+  static validatePanelTypeDefinition(def/*: PanelTypeDefinition*/)/*: boolean*/ {
     if (!def.id) {
       return false;
     }
@@ -90,4 +108,4 @@ class PanelRegistration {
   }
 }
 
-export { PanelRegistration };
+export { PanelType };
