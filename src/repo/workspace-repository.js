@@ -11,9 +11,9 @@ class WorkspaceRepository {
    * Creates a new workspace and persists it to the underlying storage mechanism.
    * The $promise property on the returned Workspace will resolve to the Workspace once it has been saved.
    * @abstract
-   * @return {Workspace}
+   * @return {Promise.<Workspace>}
    */
-  createWorkspace()/*: Workspace*/ {
+  createWorkspace()/*: Promise<Workspace>*/ {
     throw new Error('not implemented');
   }
 
