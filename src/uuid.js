@@ -1,6 +1,10 @@
 // @flow
 
 /**
+ * @module UUID
+ */
+
+/**
  * Generates a version 4 UUID string.
  * @return {string}
  */
