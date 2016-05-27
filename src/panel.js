@@ -163,6 +163,36 @@ class Panel {
   remove()/*: void*/ {
     this.workspace.removePanel(this);
   }
+
+  /**
+   * Serializes a workspace into a simplified object suitable for persistence.
+   * @return {Object}
+   */
+  serialize()/*: Object*/ {
+    return {
+      id: this.id,
+      typeId: this.type.id,
+      workspaceId: this.workspace.id,
+      vprops: this.vprops
+    };
+  }
+
+  /**
+   * Restores a workspace from its serialized memento
+   * @param {Object} memento
+   */
+  deserialize(memento/*: Object*/)/*: void*/ {
+    if (this.type.id != memento.typeId) {
+      throw new Error('Unable to deserialize panel: panel type id mismatch');
+    }
+
+    if (this.workspace.id != memento.workspaceId) {
+      throw new Error('Unable to deserialize panel: workspace id mismatch');
+    }
+
+    this.id = memento.id;
+    this.vprops = memento.vprops;
+  }
 }
 
 /**

@@ -2,6 +2,7 @@
 
 /*:: import { Workspace } from '../workspace';*/
 /*:: import { Panel } from '../panel';*/
+/*:: import { PanelType } from '../panel-type';*/
 
 /**
  * @interface
@@ -28,12 +29,44 @@ class WorkspaceRepository {
   }
 
   /**
+   * Retrieves a saved workspace
+   * @abstract
+   * @param {string} id
+   * @return {Promise.<Workspace>}
+   */
+  getWorkspace(/*:: id: string*/)/*: Promise<Workspace>*/ {
+    throw new Error('not implemented');
+  }
+
+  /**
+   * Creates and saves a new panel instance
+   * @abstract
+   * @param {string} id
+   * @param {PanelType} type
+   * @param {Workspace} workspace
+   * @return {Promise.<Panel>}
+   */
+  createPanel(/*:: id: string, type: PanelType, workspace: Workspace*/)/*: Promise<Panel>*/ {
+    throw new Error('not implemented');
+  }
+
+  /**
    * Saves the provided panel to the persistence layer
    * @abstract
    * @param {Panel} panel
    * @return {Promise.<Panel>}
    */
   savePanel(/*:: panel: Panel*/)/*: Promise<Panel>*/ {
+    throw new Error('not implemented');
+  }
+
+  /**
+   * Retrieves a saved panel within the provided workspace
+   * @abstract
+   * @param {string} id
+   * @return {Promise.<Panel>}
+   */
+  getPanel(/*:: id: string*/)/*: Promise<Panel>*/ {
     throw new Error('not implemented');
   }
 }

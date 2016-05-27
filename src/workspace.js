@@ -1,6 +1,6 @@
 // @flow
 
-import { Panel } from './panel';
+/*:: import { Panel } from './panel';*/
 /*:: import { PanelType } from './panel-type';*/
 /*:: import { WorkspaceRepository } from './repo/workspace-repository';*/
 
@@ -35,17 +35,16 @@ class Workspace {
    * Instantiates a new panel of the given type definition
    * @param {string} id
    * @param {PanelType} panelType
-   * @return {Panel}
+   * @return {Promise.<Panel>}
    */
-  createPanel(id/*:string*/, panelType/*: PanelType*/, updateHandler/*: (panel: Panel) => void*/ = () => {} )/*: Panel*/ {
-    let panel = new Panel(id, panelType, this, () => {
-      updateHandler(panel);
-      this.repo.savePanel(panel);
+  createPanel(id/*:string*/, panelType/*: PanelType*/)/*: Promise<Panel>*/ {
+    let panelP = this.repo.createPanel(id, panelType, this);
+
+    panelP.then((panel) => {
+      this.panels[panel.id] = panel;
     });
 
-    this.panels[panel.id] = panel;
-    this.repo.savePanel(panel);
-    return panel;
+    return panelP;
   }
 
   /**
@@ -56,6 +55,32 @@ class Workspace {
     if (this.panels.hasOwnProperty(panel.id)) {
       delete this.panels[panel.id];
       this.repo.saveWorkspace(this);
+    }
+  }
+
+  /**
+   * Serializes a workspace into a simplified object suitable for persistence.
+   * @return {Object}
+   */
+  serialize()/*: Object*/ {
+    return {
+      id: this.id,
+      title: this.title,
+      panels: Object.keys(this.panels)
+    };
+  }
+
+  /**
+   * Restores a workspace from its serialized memento
+   * @param {Object} memento
+   */
+  deserialize(memento/*: Object*/)/*: void*/ {
+    this.id = memento.id;
+    this.title = memento.title;
+
+    this.panels = {};
+    for (let panelId of memento.panels) {
+      this.repo.getPanel(this, panelId).then((panel) => this.panels[panel.id] = panel);
     }
   }
 }

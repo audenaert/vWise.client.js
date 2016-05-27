@@ -3,7 +3,9 @@
 import * as UUID from '../uuid';
 import { WorkspaceRepository } from './workspace-repository';
 import { Workspace } from '../workspace';
-/*:: import { Panel } from '../panel';*/
+import { Panel } from '../panel';
+/*:: import { PanelType } from '../panel-type';*/
+/*:: import { PanelTypeRegistry } from '../panel-type-registry';*/
 
 const WORKSPACE_IDS_KEY/*: string*/ = 'workspace_ids';
 const WORKSPACE_PREFIX/*: string*/ = 'workspace';
@@ -15,20 +17,36 @@ const PANEL_PREFIX/*: string*/ = 'panel';
  */
 class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /*:: workspaceIds: string[];*/
+  /*:: typeRegistry: PanelTypeRegistry;*/
+  /*:: _panelCache: { [key: string]: Panel };*/
+  /*:: _workspaceCache: { [key: string]: Workspace };*/
 
-  constructor() {
+  constructor(panelTypeRegistry/*: PanelTypeRegistry*/) {
     super();
 
     if (!localStorage) {
       throw new Error('LocalStorage is not supported on this browser');
     }
 
+    /** @type {PanelTypeRegistry} */
+    this.typeRegistry = panelTypeRegistry;
+
+    /**
+     * @private
+     * @type {Object.<string,Panel>}
+     */
+    this._panelCache = {};
+
+    /**
+     * @private
+     * @type {Object.<string, Workspace>}
+     */
+    this._workspaceCache = {};
+
     /**
      * An array containing all stored workspace ids
      * @type {string[]}
      */
-
-
     let storedWorkspaceIds = localStorage.getItem(WORKSPACE_IDS_KEY);
     this.workspaceIds = storedWorkspaceIds ? JSON.parse(storedWorkspaceIds) : [];
   }
@@ -51,7 +69,8 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    * @inheritdoc
    */
   saveWorkspace(workspace/*: Workspace*/)/*: Promise<Workspace>*/ {
-    localStorage.setItem(`${WORKSPACE_PREFIX}${workspace.id}`, JSON.stringify(workspace));
+    let dto = workspace.serialize();
+    localStorage.setItem(`${WORKSPACE_PREFIX}${workspace.id}`, JSON.stringify(dto));
 
     if (this.workspaceIds.indexOf(workspace.id) < 0) {
       this.workspaceIds.push(workspace.id);
@@ -64,9 +83,72 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /**
    * @inheritdoc
    */
-  savePanel(panel/*: Panel*/)/*: Promise<Panel>*/ {
-    localStorage.setItem(`${PANEL_PREFIX}${panel.id}`, JSON.stringify(panel));
+  getWorkspace(id/*: string*/)/*: Promise<Workspace>*/ {
+    if (this._workspaceCache[id]) {
+      return Promise.resolve(this._workspaceCache[id]);
+    }
+
+    let dtoJson = localStorage.getItem(WORKSPACE_PREFIX + id);
+
+    if (!dtoJson) {
+      return Promise.reject(new Error(`Unable to find workspace with id ${id}`));
+    }
+
+    let dto = JSON.parse(dtoJson);
+    let workspace = new Workspace(dto.id, this);
+    this._workspaceCache[dto.id] = workspace;
+    workspace.deserialize(dto);
+
+    return Promise.resolve(workspace);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  createPanel(id/*: string*/, type/*: PanelType*/, workspace/*: Workspace*/) {
+    let panel = new Panel(id, type, workspace, () => { this.savePanel(panel) });
+
+    this.savePanel(panel);
+
     return Promise.resolve(panel);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  savePanel(panel/*: Panel*/)/*: Promise<Panel>*/ {
+    let dto = panel.serialize();
+    localStorage.setItem(`${PANEL_PREFIX}${panel.id}`, JSON.stringify(dto));
+    return Promise.resolve(panel);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  getPanel(id/*: string*/)/*: Promise<Panel>*/ {
+    if (this._panelCache[id]) {
+      return Promise.resolve(this._panelCache[id]);
+    }
+
+    let dtoJson = localStorage.getItem(PANEL_PREFIX + id);
+
+    if (!dtoJson) {
+      return Promise.reject(new Error(`Unable to find panel with id ${id}.`));
+    }
+
+    let dto = JSON.parse(dtoJson);
+
+    // HACK not sure how else to get these for rehydration...
+    let type = this.typeRegistry.getPanelType(dto.typeId);
+    let workspaceP = this.getWorkspace(dto.workspaceId);
+
+    return workspaceP.then((workspace) => {
+      let panel = new Panel(dto.id, type, workspace, () => { this.savePanel(panel); });
+      this._panelCache[panel.id] = panel;
+      panel.deserialize(dto);
+
+      return panel;
+    });
   }
 
   sync() {
