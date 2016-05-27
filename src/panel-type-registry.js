@@ -7,7 +7,7 @@ import { PanelType } from './panel-type';
 /**
  * Manages {@link PanelTypeDefinition} instances based on their typeId values.
  */
-class PanelRegistry {
+class PanelTypeRegistry {
   /*:: types: {[key: string]: PanelType};*/
 
   constructor() {
@@ -69,4 +69,4 @@ class PanelRegistry {
   }
 }
 
-export { PanelRegistry };
+export { PanelTypeRegistry };

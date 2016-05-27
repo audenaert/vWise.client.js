@@ -1,7 +1,7 @@
-import { PanelRegistry } from './panel-type-registry';
+import { PanelTypeRegistry } from './panel-type-registry';
 import { expect } from 'chai';
 
-describe('PanelRegistry', function () {
+describe('PanelTypeRegistry', function () {
   let registry;
 
   const def0 = {
@@ -26,7 +26,7 @@ describe('PanelRegistry', function () {
   };
 
   beforeEach(function () {
-    registry = new PanelRegistry();
+    registry = new PanelTypeRegistry();
   });
 
   describe('#register', function () {
