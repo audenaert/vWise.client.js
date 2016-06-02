@@ -19,8 +19,8 @@ const PANEL_PREFIX/*: string*/ = 'vwise_panel';
 class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /*:: workspaceIds: string[];*/
   /*:: panelIds: string[];*/
-  /*:: _panelCache: { [key: string]: Panel };*/
-  /*:: _workspaceCache: { [key: string]: Workspace };*/
+  /*:: _panelCache: { [key: string]: Promise<Panel> };*/
+  /*:: _workspaceCache: { [key: string]: Promise<Workspace> };*/
 
   constructor(mediatorRegistry/*: PanelContentMediatorRegistry*/) {
     super(mediatorRegistry);
@@ -31,13 +31,13 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
 
     /**
      * @private
-     * @type {Object.<string,Panel>}
+     * @type {Object.<string,Promise.<Panel>>}
      */
     this._panelCache = {};
 
     /**
      * @private
-     * @type {Object.<string, Workspace>}
+     * @type {Object.<string,Promise.<Workspace>>}
      */
     this._workspaceCache = {};
 
@@ -74,37 +74,41 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    * @inheritdoc
    */
   saveWorkspace(workspace/*: Workspace*/)/*: Promise<Workspace>*/ {
-    let dto = workspace.serialize();
-    localStorage.setItem(WORKSPACE_PREFIX + workspace.id, JSON.stringify(dto));
+    let dto = this.marshallWorkspace(workspace);
+    let wsid = workspace.id;
+    localStorage.setItem(WORKSPACE_PREFIX + wsid, JSON.stringify(dto));
 
-    if (this.workspaceIds.indexOf(workspace.id) < 0) {
-      this.workspaceIds.push(workspace.id);
+    let promise = Promise.resolve(workspace);
+
+    if (this.workspaceIds.indexOf(wsid) < 0) {
+      // promise should not exist in cache since we've never seen this instance before
+      // if one does exist, we have problems... override that instance with the one we're saving
+      this._workspaceCache[wsid] = promise;
+      this.workspaceIds.push(wsid);
       this.sync();
     }
 
-    return Promise.resolve(workspace);
+    return promise;
   }
 
   /**
    * @inheritdoc
    */
   getWorkspace(id/*: string*/)/*: Promise<Workspace>*/ {
-    if (this._workspaceCache[id]) {
-      return Promise.resolve(this._workspaceCache[id]);
+    if (!this._workspaceCache[id]) {
+      let json = localStorage.getItem(WORKSPACE_PREFIX + id);
+
+      if (!json) {
+        return Promise.reject(new Error(`Unable to find workspace with id ${id}`));
+      }
+
+      let dto = JSON.parse(json);
+      let workspaceP = this.unmarshallWorkspace(dto);
+      workspaceP.catch(() => delete this._workspaceCache[id]);
+      this._workspaceCache[id] = workspaceP;
     }
 
-    let dtoJson = localStorage.getItem(WORKSPACE_PREFIX + id);
-
-    if (!dtoJson) {
-      return Promise.reject(new Error(`Unable to find workspace with id ${id}`));
-    }
-
-    let dto = JSON.parse(dtoJson);
-    let workspace = new Workspace(dto.id, this);
-    this._workspaceCache[dto.id] = workspace;
-    workspace.deserialize(dto);
-
-    return Promise.resolve(workspace);
+    return this._workspaceCache[id];
   }
 
   /**
@@ -123,7 +127,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    * @inheritdoc
    */
   savePanel(panel/*: Panel*/)/*: Promise<Panel>*/ {
-    let dto = panel.serialize();
+    let dto = this.marshallPanel(panel);
     localStorage.setItem(PANEL_PREFIX + panel.id, JSON.stringify(dto));
     return Promise.resolve(panel);
   }
@@ -132,33 +136,50 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    * @inheritdoc
    */
   getPanel(workspace/*: Workspace*/, id/*: string*/)/*: Promise<Panel>*/ {
-    if (this._panelCache[id]) {
-      return Promise.resolve(this._panelCache[id]);
+    if (!this._panelCache[id]) {
+      let json = localStorage.getItem(PANEL_PREFIX + id);
+
+      if (!json) {
+        return Promise.reject(new Error(`Unable to find panel with id ${id}.`));
+      }
+
+      let dto = JSON.parse(json);
+      let panelP = this.unmarshallPanel(dto);
+      panelP.catch(() => delete this._panelCache[id]);
+      this._panelCache[id] = panelP;
     }
 
-    let dtoJson = localStorage.getItem(PANEL_PREFIX + id);
-
-    if (!dtoJson) {
-      return Promise.reject(new Error(`Unable to find panel with id ${id}.`));
-    }
-
-    let dto = JSON.parse(dtoJson);
-
-    // HACK not sure how else to get these for rehydration...
-    let type = this.mediatorRegistry.getMediator(dto.typeId);
-    let workspaceP = this.getWorkspace(dto.workspaceId);
-
-    return workspaceP.then((workspace) => {
-      let panel = new Panel(dto.id, type, workspace, () => { this.savePanel(panel); });
-      this._panelCache[panel.id] = panel;
-      panel.deserialize(dto);
-
-      return panel;
-    });
+    return this._panelCache[id];
   }
 
+  /**
+   * Synchronize local state with the data in localStorage
+   */
   sync() {
     localStorage.setItem(WORKSPACE_IDS_KEY, JSON.stringify(this.workspaceIds));
+  }
+
+  /**
+   * Delete all stored data and reset the repository to an empty state
+   */
+  reset() {
+    for (let id of this.workspaceIds) {
+      localStorage.removeItem(WORKSPACE_PREFIX + id);
+    }
+
+    localStorage.removeItem(WORKSPACE_IDS_KEY);
+
+    this.workspaceIds = [];
+    this._workspaceCache = {};
+
+    for (let id of this.panelIds) {
+      localStorage.removeItem(PANEL_PREFIX + id);
+    }
+
+    localStorage.removeItem(PANEL_IDS_KEY);
+
+    this.panelIds = [];
+    this._panelCache = {};
   }
 }
 
