@@ -108,7 +108,7 @@ class WorkspaceRepository {
     let mediator = this.mediatorRegistry.getMediator(dto.mediatorId);
     let workspaceP = this.getWorkspace(dto.workspaceId);
 
-    let contentP = dto.content ? mediator.unmarshall(dto.content) : Promise.resolve(null);
+    let contentP = dto.content ? mediator.unmarshall(dto.content) : Promise.resolve();
 
     let panelP = Promise.all([workspaceP, contentP]).then(([workspace, content]) => {
       let panel = new Panel(dto.id, mediator, workspace, p => { this.savePanel(p); });
