@@ -1,11 +1,15 @@
 import { Panel } from './panel';
 import { PanelContentMediator } from './panel-content-mediator';
+import { PanelContentMediatorRegistry } from './panel-content-mediator-registry';
 import { Workspace } from './workspace';
 import { WorkspaceRepository } from './repo/workspace-repository';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
 const mediator = new PanelContentMediator('hello', 'Hello, World!', 'This is a test panel definition.');
+
+const mediatorRegistry = new PanelContentMediatorRegistry();
+mediatorRegistry.register(mediator);
 
 class DummyWorkspaceRepository extends WorkspaceRepository {
   createWorkspace() {
@@ -33,7 +37,7 @@ class DummyWorkspaceRepository extends WorkspaceRepository {
   }
 }
 
-const dummyRepo = new DummyWorkspaceRepository();
+const dummyRepo = new DummyWorkspaceRepository(mediatorRegistry);
 
 const workspace = new Workspace('test-workspace', dummyRepo);
 
@@ -138,7 +142,7 @@ describe('Panel', function () {
     });
   });
 
-  describe('#setAll', function () {
+  describe('#setVisualProperties', function () {
     let spy;
     let panel;
 
@@ -154,7 +158,7 @@ describe('Panel', function () {
         abc: 123
       };
 
-      panel.setAll(properties);
+      panel.setVisualProperties(properties);
       panel.vprops.should.have.property('hello', 'world');
       panel.vprops.should.have.property('foo', 'bar');
       panel.vprops.should.have.property('abc', 123);
@@ -176,14 +180,14 @@ describe('Panel', function () {
 
     it('should get a properties that were previously set', function () {
       panel.set('hello', 'world');
-      panel.setAll({ foo: 'bar', abc: 123});
+      panel.setVisualProperties({ foo: 'bar', abc: 123});
       panel.get('hello').should.equal('world');
       panel.get('foo').should.equal('bar');
       panel.get('abc').should.equal(123);
     });
   });
 
-  describe('#getAll', function () {
+  describe('#getVisualProperties', function () {
     let panel;
 
     beforeEach(function () {
@@ -192,45 +196,18 @@ describe('Panel', function () {
 
     it('should return all display properties', function () {
       panel.set('hello', 'world');
-      let props = panel.getAll();
+      let props = panel.getVisualProperties();
       props.should.deep.equal(panel.vprops);
     });
 
     it('should return a copy of panel.vprops and should not be affected by updates', function () {
-      let before = panel.getAll();
+      let before = panel.getVisualProperties();
       panel.set('hello', 'world');
-      let after = panel.getAll();
+      let after = panel.getVisualProperties();
 
       before.should.not.have.property('hello');
       after.should.have.property('hello', 'world');
     })
-  });
-
-  describe('#serialize', function () {
-    let panel = new Panel('test', mediator, workspace, noop);
-
-    it('should return an object that can be serialized into JSON and back', function () {
-      let dto0 = panel.serialize();
-      let dto1 = JSON.parse(JSON.stringify(dto0));
-
-      dto0.should.be.ok;
-      dto0.should.deep.equal(dto1);
-    });
-  });
-
-  describe('#deserialize', function () {
-    it('should repopulate a panel instance with serialized values', function () {
-      let panel0 = new Panel('test', mediator, workspace, noop);
-      panel0.set('hello', 'world');
-
-      let dto0 = panel0.serialize();
-      let dto1 = JSON.parse(JSON.stringify(dto0));
-
-      let panel1 = new Panel(null, mediator, workspace, noop);
-      panel1.deserialize(dto1);
-
-      panel0.should.deep.equal(panel1);
-    });
   });
 });
 

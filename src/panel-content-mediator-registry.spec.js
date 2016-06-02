@@ -3,12 +3,13 @@ import { PanelContentMediatorRegistry } from './panel-content-mediator-registry'
 import { expect } from 'chai';
 
 class TestMediator extends PanelContentMediator {
-  constructor() {
-    super('test', 'Test Mediator');
+  constructor(id, matchString) {
+    super(id, `Test Mediator (${id})`);
+    this.matchString = matchString || id;
   }
 
   matches(obj) {
-    return obj === 'test';
+    return obj === this.matchString;
   }
 }
 
@@ -92,14 +93,23 @@ describe('PanelContentMediatorRegistry', function () {
   });
 
   describe('#findContentMediators', function () {
-    it('should return a list of mediators', function () {
-      registry.register(new TestMediator());
-      registry.findContentMediators('test');
+    it('should return a list of mediators for which #matches returns true', function () {
+      registry.register(new TestMediator('foo'));
+      registry.register(new TestMediator('bar'))
+      let mediators = registry.findContentMediators('foo');
+
+      mediators.should.be.an('array');
+      mediators.should.not.be.empty;
+      mediators.should.have.lengthOf(1);
     });
 
     it('should return an empty list if none can handle object', function () {
-      registry.register(mediator0);
-      registry.findContentMediators({});
+      registry.register(new TestMediator('foo'));
+      registry.register(new TestMediator('bar'));
+      let mediators = registry.findContentMediators('baz');
+
+      mediators.should.be.an('array');
+      mediators.should.be.empty;
     });
   });
 });
