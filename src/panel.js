@@ -75,7 +75,7 @@ class Panel {
    * @param {integer} height
    */
   setSize(width/*: number*/, height/*: number*/)/*: void*/ {
-    this.setAll({ width, height });
+    this.setVisualProperties({ width, height });
   }
 
   /**
@@ -96,7 +96,7 @@ class Panel {
    * @param {integer} yPosition
    */
   setPosition(xPosition/*: number*/, yPosition/*: number*/)/*: void*/ {
-    this.setAll({ xPosition, yPosition });
+    this.setVisualProperties({ xPosition, yPosition });
   }
 
   /**
@@ -111,21 +111,21 @@ class Panel {
   }
 
   /**
-   * Sets an arbitrary property on the panel.
+   * Sets an arbitrary visual property on the panel.
    * Triggers update handler after property has been set.
    * @param {string} property
    * @param {Object} [value]
    */
   set(property/*: string*/, value/*: any*/)/*: void*/ {
-    this.setAll({ [property]: value });
+    this.setVisualProperties({ [property]: value });
   }
 
   /**
-   * Copies provided key/value pairs from provided object into panel properties
+   * Copies provided key/value pairs from provided object into panel visual properties
    * Triggers update handler after all properties have been set.
    * @param {Object.<string,Object>} [props = {}]
    */
-  setAll(props/*: { [key: string]: any }*/ = {})/*: void*/ {
+  setVisualProperties(props/*: { [key: string]: any }*/ = {})/*: void*/ {
     for (let prop in props) if (props.hasOwnProperty(prop)) {
       this.vprops[prop] = props[prop];
     }
@@ -136,7 +136,7 @@ class Panel {
   }
 
   /**
-   * Retrieves a specific named panel property.
+   * Retrieves a specific named panel visual property.
    * @param {string} property
    * @return {Object}
    */
@@ -149,7 +149,7 @@ class Panel {
    * The returned object is a shallow copy of the underlying data structure.
    * @return {Object.<string,Object>}
    */
-  getAll()/*: { [key: string]: any }*/ {
+  getVisualProperties()/*: { [key: string]: any }*/ {
     let clone = {};
 
     for (let prop in this.vprops) if (this.vprops.hasOwnProperty(prop)) {
