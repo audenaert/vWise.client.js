@@ -1,25 +1,21 @@
 // @flow
 
-/**
- * Formats personalized greetings.
- */
-class Greeter {
-  /*:: name: string;*/
+import { WorkspaceRepository } from './repo/workspace-repository';
+import { LocalStorageWorkspaceRepository } from './repo/localstorage';
 
-  /**
-   * @param  {string} name
-   */
-  constructor(name/*: string*/ = 'World') {
-    this.name = name;
-  }
+import { PanelContentMediator } from './panel-content-mediator';
+import { PanelContentMediatorRegistry } from './panel-content-mediator-registry';
+import { Workspace } from './workspace';
+import { Panel } from './panel';
 
-  /**
-   * Formats a personalized greeting for a particular individual.
-   * @return {string} The formatted greeting
-   */
-  greet()/*: string*/ {
-    return `Hello, ${this.name}!`;
-  }
+import * as UUID from './uuid';
+
+export {
+  LocalStorageWorkspaceRepository,
+  PanelContentMediator,
+  PanelContentMediatorRegistry,
+  Workspace,
+  WorkspaceRepository,
+  Panel,
+  UUID
 }
-
-export { Greeter };
