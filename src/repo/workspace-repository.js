@@ -2,7 +2,7 @@
 
 /*:: import { Workspace } from '../workspace';*/
 /*:: import { Panel } from '../panel';*/
-/*:: import { PanelType } from '../panel-type';*/
+/*:: import { PanelContentMediator } from '../panel-content-mediator';*/
 
 /**
  * @interface
@@ -42,11 +42,11 @@ class WorkspaceRepository {
    * Creates and saves a new panel instance
    * @abstract
    * @param {string} id
-   * @param {PanelType} type
+   * @param {PanelContentMediator} type
    * @param {Workspace} workspace
    * @return {Promise.<Panel>}
    */
-  createPanel(/*:: id: string, type: PanelType, workspace: Workspace*/)/*: Promise<Panel>*/ {
+  createPanel(/*:: type: PanelContentMediator, workspace: Workspace*/)/*: Promise<Panel>*/ {
     throw new Error('not implemented');
   }
 
@@ -66,7 +66,7 @@ class WorkspaceRepository {
    * @param {string} id
    * @return {Promise.<Panel>}
    */
-  getPanel(/*:: id: string*/)/*: Promise<Panel>*/ {
+  getPanel(/*:: workspace: Workspace, id: string*/)/*: Promise<Panel>*/ {
     throw new Error('not implemented');
   }
 }

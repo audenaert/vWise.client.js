@@ -1,7 +1,7 @@
 // @flow
 
 /*:: import { Workspace } from './workspace';*/
-/*:: import { PanelType } from './panel-type';*/
+/*:: import { PanelContentMediator } from './panel-content-mediator';*/
 
 /*:: type Point = { x: number, y: number };*/
 /**
@@ -22,7 +22,7 @@
 
 class Panel {
   /*:: id: string;*/
-  /*:: type: PanelType;*/
+  /*:: contentMediator: PanelContentMediator;*/
   /*:: workspace: Workspace;*/
   /*:: vprops: { [key: string]: any };*/
   /*:: content: any;*/
@@ -30,16 +30,16 @@ class Panel {
 
   /**
    * @param {string} id
-   * @param {PanelType} type
+   * @param {PanelContentMediator} contentMediator
    * @param {Workspace} workspace
    * @return {Workspace}
    */
-  constructor(id/*: string */, type/*: PanelType*/, workspace/*: Workspace*/, updateHandler/*: (panel: Panel) => void*/) {
+  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, updateHandler/*: (panel: Panel) => void*/) {
     /** @type {string} */
     this.id = id;
 
-    /** @type {PanelType} */
-    this.type = type;
+    /** @type {PanelContentMediator} */
+    this.contentMediator = contentMediator;
 
     /** @type {Workspace} */
     this.workspace = workspace;
@@ -171,7 +171,7 @@ class Panel {
   serialize()/*: Object*/ {
     return {
       id: this.id,
-      typeId: this.type.id,
+      mediatorId: this.contentMediator.id,
       workspaceId: this.workspace.id,
       vprops: this.vprops
     };
@@ -182,7 +182,7 @@ class Panel {
    * @param {Object} memento
    */
   deserialize(memento/*: Object*/)/*: void*/ {
-    if (this.type.id != memento.typeId) {
+    if (this.contentMediator.id != memento.mediatorId) {
       throw new Error('Unable to deserialize panel: panel type id mismatch');
     }
 

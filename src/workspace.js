@@ -1,7 +1,7 @@
 // @flow
 
 /*:: import { Panel } from './panel';*/
-/*:: import { PanelType } from './panel-type';*/
+/*:: import { PanelContentMediator } from './panel-content-mediator';*/
 /*:: import { WorkspaceRepository } from './repo/workspace-repository';*/
 
 class Workspace {
@@ -33,12 +33,11 @@ class Workspace {
 
   /**
    * Instantiates a new panel of the given type definition
-   * @param {string} id
-   * @param {PanelType} panelType
+   * @param {PanelContentMediator} panelType
    * @return {Promise.<Panel>}
    */
-  createPanel(id/*:string*/, panelType/*: PanelType*/)/*: Promise<Panel>*/ {
-    let panelP = this.repo.createPanel(id, panelType, this);
+  createPanel(panelType/*: PanelContentMediator*/)/*: Promise<Panel>*/ {
+    let panelP = this.repo.createPanel(panelType, this);
 
     panelP.then((panel) => {
       this.panels[panel.id] = panel;

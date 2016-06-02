@@ -4,8 +4,8 @@ import * as UUID from '../uuid';
 import { WorkspaceRepository } from './workspace-repository';
 import { Workspace } from '../workspace';
 import { Panel } from '../panel';
-/*:: import { PanelType } from '../panel-type';*/
-/*:: import { PanelTypeRegistry } from '../panel-type-registry';*/
+/*:: import { PanelContentMediator } from '../panel-content-mediator';*/
+/*:: import { PanelContentMediatorRegistry } from '../panel-content-mediator-registry';*/
 
 const WORKSPACE_IDS_KEY/*: string*/ = 'workspace_ids';
 const WORKSPACE_PREFIX/*: string*/ = 'workspace';
@@ -17,19 +17,19 @@ const PANEL_PREFIX/*: string*/ = 'panel';
  */
 class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /*:: workspaceIds: string[];*/
-  /*:: typeRegistry: PanelTypeRegistry;*/
+  /*:: mediatorRegistry: PanelContentMediatorRegistry;*/
   /*:: _panelCache: { [key: string]: Panel };*/
   /*:: _workspaceCache: { [key: string]: Workspace };*/
 
-  constructor(panelTypeRegistry/*: PanelTypeRegistry*/) {
+  constructor(panelTypeRegistry/*: PanelContentMediatorRegistry*/) {
     super();
 
     if (!localStorage) {
       throw new Error('LocalStorage is not supported on this browser');
     }
 
-    /** @type {PanelTypeRegistry} */
-    this.typeRegistry = panelTypeRegistry;
+    /** @type {PanelContentMediatorRegistry} */
+    this.mediatorRegistry = panelTypeRegistry;
 
     /**
      * @private
@@ -70,7 +70,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    */
   saveWorkspace(workspace/*: Workspace*/)/*: Promise<Workspace>*/ {
     let dto = workspace.serialize();
-    localStorage.setItem(`${WORKSPACE_PREFIX}${workspace.id}`, JSON.stringify(dto));
+    localStorage.setItem(WORKSPACE_PREFIX + workspace.id, JSON.stringify(dto));
 
     if (this.workspaceIds.indexOf(workspace.id) < 0) {
       this.workspaceIds.push(workspace.id);
@@ -105,8 +105,9 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /**
    * @inheritdoc
    */
-  createPanel(id/*: string*/, type/*: PanelType*/, workspace/*: Workspace*/) {
-    let panel = new Panel(id, type, workspace, () => { this.savePanel(panel) });
+  createPanel(mediator/*: PanelContentMediator*/, workspace/*: Workspace*/)/*: Promise<Panel>*/ {
+    let id = UUID.uuid4();
+    let panel = new Panel(id, mediator, workspace, () => { this.savePanel(panel) });
 
     this.savePanel(panel);
 
@@ -118,14 +119,14 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    */
   savePanel(panel/*: Panel*/)/*: Promise<Panel>*/ {
     let dto = panel.serialize();
-    localStorage.setItem(`${PANEL_PREFIX}${panel.id}`, JSON.stringify(dto));
+    localStorage.setItem(PANEL_PREFIX + panel.id, JSON.stringify(dto));
     return Promise.resolve(panel);
   }
 
   /**
    * @inheritdoc
    */
-  getPanel(id/*: string*/)/*: Promise<Panel>*/ {
+  getPanel(workspace/*: Workspace*/, id/*: string*/)/*: Promise<Panel>*/ {
     if (this._panelCache[id]) {
       return Promise.resolve(this._panelCache[id]);
     }
@@ -139,7 +140,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
     let dto = JSON.parse(dtoJson);
 
     // HACK not sure how else to get these for rehydration...
-    let type = this.typeRegistry.getPanelType(dto.typeId);
+    let type = this.mediatorRegistry.getMediator(dto.typeId);
     let workspaceP = this.getWorkspace(dto.workspaceId);
 
     return workspaceP.then((workspace) => {
