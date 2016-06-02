@@ -26,7 +26,7 @@ class Panel {
   /*:: workspace: Workspace;*/
   /*:: vprops: { [key: string]: any };*/
   /*:: content: any;*/
-  /*:: updateHandler: (panel: Panel) => void;*/
+  /*:: updateHandler: ?(panel: Panel) => void;*/
 
   /**
    * @param {string} id
@@ -34,7 +34,7 @@ class Panel {
    * @param {Workspace} workspace
    * @return {Workspace}
    */
-  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, updateHandler/*: (panel: Panel) => void*/) {
+  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, updateHandler/*: ?(panel: Panel) => void*/) {
     /** @type {string} */
     this.id = id;
 
@@ -129,7 +129,10 @@ class Panel {
     for (let prop in props) if (props.hasOwnProperty(prop)) {
       this.vprops[prop] = props[prop];
     }
-    this.updateHandler(this);
+
+    if (this.updateHandler) {
+      this.updateHandler(this);
+    }
   }
 
   /**
