@@ -56,32 +56,6 @@ class Workspace {
       this.repo.saveWorkspace(this);
     }
   }
-
-  /**
-   * Serializes a workspace into a simplified object suitable for persistence.
-   * @return {Object}
-   */
-  serialize()/*: Object*/ {
-    return {
-      id: this.id,
-      title: this.title,
-      panels: Object.keys(this.panels)
-    };
-  }
-
-  /**
-   * Restores a workspace from its serialized memento
-   * @param {Object} memento
-   */
-  deserialize(memento/*: Object*/)/*: void*/ {
-    this.id = memento.id;
-    this.title = memento.title;
-
-    this.panels = {};
-    for (let panelId of memento.panels) {
-      this.repo.getPanel(this, panelId).then((panel) => this.panels[panel.id] = panel);
-    }
-  }
 }
 
 /**

@@ -1,7 +1,7 @@
 // @flow
 
-/*:: import { Workspace } from '../workspace';*/
-/*:: import { Panel } from '../panel';*/
+import { Panel } from '../panel';
+import { Workspace } from '../workspace';
 /*:: import { PanelContentMediator } from '../panel-content-mediator';*/
 /*:: import { PanelContentMediatorRegistry } from '../panel-content-mediator-registry';*/
 
@@ -76,6 +76,78 @@ class WorkspaceRepository {
    */
   getPanel(/*:: workspace: Workspace, id: string*/)/*: Promise<Panel>*/ {
     throw new Error('WorkspaceRepository#getPanel not implemented');
+  }
+
+  /**
+   * Marshalls a {@link Panel} instance into a simplified DTO for persistence.
+   * @private
+   * @param  {Panel} panel
+   * @return {Object}
+   */
+  marshallPanel(panel/*: Panel*/)/*: Object*/ {
+    let dto = {};
+
+    dto.id = panel.id;
+    dto.mediatorId = panel.contentMediator.id;
+    dto.workspaceId = panel.workspace.id;
+    dto.vprops = panel.getVisualProperties();
+
+    if (panel.content) {
+      dto.content = panel.contentMediator.marshall(panel.content);
+    }
+
+    return dto;
+  }
+
+  /**
+   * Repopulates panel data from a marshalled DTO.
+   * @param  {Object} dto
+   * @return {Promise.<Panel>}
+   */
+  unmarshallPanel(dto/*: Object*/)/*: Promise<Panel>*/ {
+    let mediator = this.mediatorRegistry.getMediator(dto.mediatorId);
+    let workspaceP = this.getWorkspace(dto.workspaceId);
+
+    let contentP = dto.content ? mediator.unmarshall(dto.content) : Promise.resolve(null);
+
+    let panelP = Promise.all([workspaceP, contentP]).then(([workspace, content]) => {
+      let panel = new Panel(dto.id, mediator, workspace, p => { this.savePanel(p); });
+      panel.vprops = dto.vprops;
+
+      if (content) {
+        panel.content = content;
+      }
+
+      return panel;
+    });
+
+    return panelP;
+  }
+
+  /**
+   * Marshalls a workspace into a simplified object suitable for persistence.
+   * @param {Workspace} workspace
+   * @return {Object}
+   */
+  marshallWorkspace(workspace/*: Workspace*/)/*: Object*/ {
+    return {
+      id: workspace.id,
+      title: workspace.title,
+      panels: Object.keys(workspace.panels)
+    };
+  }
+
+  /**
+   * Restores a workspace from its marshalled DTO
+   * @param {Object} dto
+   * @return {Promise.<Workspace>}
+   */
+  unmarshallWorkspace(dto/*: Object*/)/*: Promise<Workspace>*/ {
+    let ws = new Workspace(dto.id, this);
+    ws.title = dto.title;
+
+    let panelPs = dto.panels.map(id => this.getPanel(ws, id).then((p) => ws.panels[id] = p));
+    return Promise.all(panelPs).then(() => ws);
   }
 }
 
