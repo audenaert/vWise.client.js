@@ -3,11 +3,19 @@
 /*:: import { Workspace } from '../workspace';*/
 /*:: import { Panel } from '../panel';*/
 /*:: import { PanelContentMediator } from '../panel-content-mediator';*/
+/*:: import { PanelContentMediatorRegistry } from '../panel-content-mediator-registry';*/
 
 /**
  * @interface
  */
 class WorkspaceRepository {
+  /*:: mediatorRegistry: PanelContentMediatorRegistry;*/
+
+  constructor(mediatorRegistry/*: PanelContentMediatorRegistry*/) {
+    /** @type {PanelContentMediatorRegistry} */
+    this.mediatorRegistry = mediatorRegistry;
+  }
+
   /**
    * Creates a new workspace and persists it to the underlying storage mechanism.
    * The $promise property on the returned Workspace will resolve to the Workspace once it has been saved.
@@ -15,7 +23,7 @@ class WorkspaceRepository {
    * @return {Promise.<Workspace>}
    */
   createWorkspace()/*: Promise<Workspace>*/ {
-    throw new Error('not implemented');
+    throw new Error('WorkspaceRepository#createWorkspace not implemented');
   }
 
   /**
@@ -25,7 +33,7 @@ class WorkspaceRepository {
    * @return {Promise.<Workspace>}
    */
   saveWorkspace(/*:: workspace: Workspace*/)/*: Promise<Workspace>*/ {
-    throw new Error('not implemented');
+    throw new Error('WorkspaceRepository#saveWorkspace not implemented');
   }
 
   /**
@@ -35,7 +43,7 @@ class WorkspaceRepository {
    * @return {Promise.<Workspace>}
    */
   getWorkspace(/*:: id: string*/)/*: Promise<Workspace>*/ {
-    throw new Error('not implemented');
+    throw new Error('WorkspaceRepository#getWorkspace not implemented');
   }
 
   /**
@@ -47,7 +55,7 @@ class WorkspaceRepository {
    * @return {Promise.<Panel>}
    */
   createPanel(/*:: type: PanelContentMediator, workspace: Workspace*/)/*: Promise<Panel>*/ {
-    throw new Error('not implemented');
+    throw new Error('WorkspaceRepository#createPanel not implemented');
   }
 
   /**
@@ -57,7 +65,7 @@ class WorkspaceRepository {
    * @return {Promise.<Panel>}
    */
   savePanel(/*:: panel: Panel*/)/*: Promise<Panel>*/ {
-    throw new Error('not implemented');
+    throw new Error('WorkspaceRepository#savePanel not implemented');
   }
 
   /**
@@ -67,7 +75,7 @@ class WorkspaceRepository {
    * @return {Promise.<Panel>}
    */
   getPanel(/*:: workspace: Workspace, id: string*/)/*: Promise<Panel>*/ {
-    throw new Error('not implemented');
+    throw new Error('WorkspaceRepository#getPanel not implemented');
   }
 }
 

@@ -19,19 +19,15 @@ const PANEL_PREFIX/*: string*/ = 'vwise_panel';
 class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /*:: workspaceIds: string[];*/
   /*:: panelIds: string[];*/
-  /*:: mediatorRegistry: PanelContentMediatorRegistry;*/
   /*:: _panelCache: { [key: string]: Panel };*/
   /*:: _workspaceCache: { [key: string]: Workspace };*/
 
-  constructor(panelTypeRegistry/*: PanelContentMediatorRegistry*/) {
-    super();
+  constructor(mediatorRegistry/*: PanelContentMediatorRegistry*/) {
+    super(mediatorRegistry);
 
     if (!localStorage) {
       throw new Error('LocalStorage is not supported on this browser');
     }
-
-    /** @type {PanelContentMediatorRegistry} */
-    this.mediatorRegistry = panelTypeRegistry;
 
     /**
      * @private
