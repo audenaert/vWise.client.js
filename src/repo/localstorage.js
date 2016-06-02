@@ -7,16 +7,18 @@ import { Panel } from '../panel';
 /*:: import { PanelContentMediator } from '../panel-content-mediator';*/
 /*:: import { PanelContentMediatorRegistry } from '../panel-content-mediator-registry';*/
 
-const WORKSPACE_IDS_KEY/*: string*/ = 'workspace_ids';
-const WORKSPACE_PREFIX/*: string*/ = 'workspace';
+const WORKSPACE_IDS_KEY/*: string*/ = 'vwise_workspace_ids';
+const WORKSPACE_PREFIX/*: string*/ = 'vwise_workspace';
 
-const PANEL_PREFIX/*: string*/ = 'panel';
+const PANEL_IDS_KEY/*: string*/ = 'vwise_panel_ids';
+const PANEL_PREFIX/*: string*/ = 'vwise_panel';
 
 /**
  * @implements {WorkspaceRepository}
  */
 class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /*:: workspaceIds: string[];*/
+  /*:: panelIds: string[];*/
   /*:: mediatorRegistry: PanelContentMediatorRegistry;*/
   /*:: _panelCache: { [key: string]: Panel };*/
   /*:: _workspaceCache: { [key: string]: Workspace };*/
@@ -43,12 +45,19 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
      */
     this._workspaceCache = {};
 
+    let storedWorkspaceIds = localStorage.getItem(WORKSPACE_IDS_KEY);
     /**
      * An array containing all stored workspace ids
      * @type {string[]}
      */
-    let storedWorkspaceIds = localStorage.getItem(WORKSPACE_IDS_KEY);
     this.workspaceIds = storedWorkspaceIds ? JSON.parse(storedWorkspaceIds) : [];
+
+    let storedPanelIds = localStorage.getItem(PANEL_IDS_KEY);
+    /**
+     * An array containing all stored panel ids
+     * @type {string[]}
+     */
+    this.panelIds = storedPanelIds ? JSON.parse(storedPanelIds) : [];
   }
 
   /**
