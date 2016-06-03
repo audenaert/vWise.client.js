@@ -1,6 +1,7 @@
 // @flow
 
 import * as UUID from '../uuid';
+import { Cache } from '../cache';
 import { WorkspaceRepository } from './workspace-repository';
 import { Workspace } from '../workspace';
 import { Panel } from '../panel';
@@ -19,8 +20,8 @@ const PANEL_PREFIX/*: string*/ = 'vwise_panel';
 class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /*:: workspaceIds: string[];*/
   /*:: panelIds: string[];*/
-  /*:: _panelCache: { [key: string]: Promise<Panel> };*/
-  /*:: _workspaceCache: { [key: string]: Promise<Workspace> };*/
+  /*:: _panelCache: Cache<Promise<Panel>>;*/
+  /*:: _workspaceCache: Cache<Promise<Workspace>>;*/
 
   constructor(mediatorRegistry/*: PanelContentMediatorRegistry*/) {
     super(mediatorRegistry);
@@ -31,15 +32,15 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
 
     /**
      * @private
-     * @type {Object.<string,Promise.<Panel>>}
+     * @type {Cache.<Promise.<Panel>>}
      */
-    this._panelCache = {};
+    this._panelCache = new Cache();
 
     /**
      * @private
-     * @type {Object.<string,Promise.<Workspace>>}
+     * @type {Cache.<Promise.<Workspace>>}
      */
-    this._workspaceCache = {};
+    this._workspaceCache = new Cache();
 
     let storedWorkspaceIds = localStorage.getItem(WORKSPACE_IDS_KEY);
     /**
@@ -75,16 +76,16 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    */
   saveWorkspace(workspace/*: Workspace*/)/*: Promise<Workspace>*/ {
     let dto = this.marshallWorkspace(workspace);
-    let wsid = workspace.id;
-    localStorage.setItem(WORKSPACE_PREFIX + wsid, JSON.stringify(dto));
+    let id = workspace.id;
+    localStorage.setItem(WORKSPACE_PREFIX + id, JSON.stringify(dto));
 
     let promise = Promise.resolve(workspace);
 
-    if (this.workspaceIds.indexOf(wsid) < 0) {
+    if (this.workspaceIds.indexOf(id) < 0) {
       // promise should not exist in cache since we've never seen this instance before
       // if one does exist, we have problems... override that instance with the one we're saving
-      this._workspaceCache[wsid] = promise;
-      this.workspaceIds.push(wsid);
+      this._workspaceCache.fetch(id, promise);
+      this.workspaceIds.push(id);
       this.sync();
     }
 
@@ -95,7 +96,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    * @inheritdoc
    */
   getWorkspace(id/*: string*/)/*: Promise<Workspace>*/ {
-    if (!this._workspaceCache[id]) {
+    return this._workspaceCache.fetch(id, () => {
       let json = localStorage.getItem(WORKSPACE_PREFIX + id);
 
       if (!json) {
@@ -104,11 +105,9 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
 
       let dto = JSON.parse(json);
       let workspaceP = this.unmarshallWorkspace(dto);
-      workspaceP.catch(() => delete this._workspaceCache[id]);
-      this._workspaceCache[id] = workspaceP;
-    }
-
-    return this._workspaceCache[id];
+      workspaceP.catch(() => this._workspaceCache.clear(id));
+      return workspaceP;
+    });
   }
 
   /**
@@ -136,7 +135,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    * @inheritdoc
    */
   getPanel(workspace/*: Workspace*/, id/*: string*/)/*: Promise<Panel>*/ {
-    if (!this._panelCache[id]) {
+    return this._panelCache.fetch(id, () => {
       let json = localStorage.getItem(PANEL_PREFIX + id);
 
       if (!json) {
@@ -145,11 +144,9 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
 
       let dto = JSON.parse(json);
       let panelP = this.unmarshallPanel(dto);
-      panelP.catch(() => delete this._panelCache[id]);
-      this._panelCache[id] = panelP;
-    }
-
-    return this._panelCache[id];
+      panelP.catch(() => this._panelCache.clear(id));
+      return panelP;
+    });
   }
 
   /**
@@ -170,7 +167,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
     localStorage.removeItem(WORKSPACE_IDS_KEY);
 
     this.workspaceIds = [];
-    this._workspaceCache = {};
+    this._workspaceCache.clear();
 
     for (let id of this.panelIds) {
       localStorage.removeItem(PANEL_PREFIX + id);
@@ -179,7 +176,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
     localStorage.removeItem(PANEL_IDS_KEY);
 
     this.panelIds = [];
-    this._panelCache = {};
+    this._panelCache.clear();
   }
 }
 

@@ -8,6 +8,7 @@ import { PanelContentMediatorRegistry } from './panel-content-mediator-registry'
 import { Workspace } from './workspace';
 import { Panel } from './panel';
 
+import { Cache } from './cache';
 import * as UUID from './uuid';
 
 export {
@@ -17,5 +18,6 @@ export {
   Workspace,
   WorkspaceRepository,
   Panel,
+  Cache,
   UUID
 }
