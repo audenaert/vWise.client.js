@@ -23,7 +23,7 @@ describe('WorkspaceRepository', function () {
 
   describe('#marshallPanel', function () {
     it('should return an object that can be serialized into JSON and back', function () {
-      let panel = new Panel('test', mediator, workspace);
+      let panel = new Panel('test', mediator, workspace, { hello: 'world' });
       let dto0 = repo.marshallPanel(panel);
       let dto1 = JSON.parse(JSON.stringify(dto0));
 
@@ -38,7 +38,7 @@ describe('WorkspaceRepository', function () {
       // unmarshalling a panel calls WorkspaceRepository#getWorkspace
       sinon.stub(repo, 'getWorkspace').returns(Promise.resolve(workspace));
 
-      let panel0 = new Panel('test', mediator, workspace);
+      let panel0 = new Panel('test', mediator, workspace, { hello: 'world' });
       panel0.set('hello', 'world');
 
       let dto0 = repo.marshallPanel(panel0);

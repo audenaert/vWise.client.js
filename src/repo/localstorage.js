@@ -113,9 +113,9 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /**
    * @inheritdoc
    */
-  createPanel(mediator/*: PanelContentMediator*/, workspace/*: Workspace*/)/*: Promise<Panel>*/ {
+  createPanel/*:: <T>*/(mediator/*: PanelContentMediator*/, workspace/*: Workspace*/, panelContent/*: T*/)/*: Promise<Panel<T>>*/ {
     let id = UUID.uuid4();
-    let panel = new Panel(id, mediator, workspace, () => { this.savePanel(panel) });
+    let panel = new Panel(id, mediator, workspace, panelContent, () => { this.savePanel(panel) });
 
     this.savePanel(panel);
 

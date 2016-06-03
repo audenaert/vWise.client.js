@@ -54,7 +54,7 @@ class WorkspaceRepository {
    * @param {Workspace} workspace
    * @return {Promise.<Panel>}
    */
-  createPanel(/*:: type: PanelContentMediator, workspace: Workspace*/)/*: Promise<Panel>*/ {
+  createPanel/*:: <T>*/(/*:: type: PanelContentMediator, workspace: Workspace, panelContent: T*/)/*: Promise<Panel<T>>*/ {
     throw new Error('WorkspaceRepository#createPanel not implemented');
   }
 
@@ -91,10 +91,7 @@ class WorkspaceRepository {
     dto.mediatorId = panel.contentMediator.id;
     dto.workspaceId = panel.workspace.id;
     dto.vprops = panel.getVisualProperties();
-
-    if (panel.content) {
-      dto.content = panel.contentMediator.marshall(panel.content);
-    }
+    dto.content = panel.contentMediator.marshall(panel.content);
 
     return dto;
   }
@@ -107,17 +104,11 @@ class WorkspaceRepository {
   unmarshallPanel(dto/*: Object*/)/*: Promise<Panel>*/ {
     let mediator = this.mediatorRegistry.getMediator(dto.mediatorId);
     let workspaceP = this.getWorkspace(dto.workspaceId);
-
-    let contentP = dto.content ? mediator.unmarshall(dto.content) : Promise.resolve();
+    let contentP = mediator.unmarshall(dto.content);
 
     let panelP = Promise.all([workspaceP, contentP]).then(([workspace, content]) => {
-      let panel = new Panel(dto.id, mediator, workspace, p => { this.savePanel(p); });
+      let panel = new Panel(dto.id, mediator, workspace, content, p => { this.savePanel(p); });
       panel.vprops = dto.vprops;
-
-      if (content) {
-        panel.content = content;
-      }
-
       return panel;
     });
 

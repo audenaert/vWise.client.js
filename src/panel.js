@@ -20,29 +20,45 @@
  */
 
 
-class Panel {
+class Panel/*:: <T>*/ {
   /*:: id: string;*/
   /*:: contentMediator: PanelContentMediator;*/
   /*:: workspace: Workspace;*/
   /*:: vprops: { [key: string]: any };*/
-  /*:: content: any;*/
+  /*:: content: T;*/
   /*:: updateHandler: ?(panel: Panel) => void;*/
 
   /**
    * @param {string} id
    * @param {PanelContentMediator} contentMediator
    * @param {Workspace} workspace
+   * @param {*} content
    * @return {Workspace}
    */
-  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, updateHandler/*: ?(panel: Panel) => void*/) {
+  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, content/*: T*/, updateHandler/*: ?(panel: Panel<T>) => void*/) {
+    if (!id) {
+      throw new Error('no id provided');
+    }
     /** @type {string} */
     this.id = id;
 
+    if (!contentMediator) {
+      throw new Error('no content mediator provided');
+    }
     /** @type {PanelContentMediator} */
     this.contentMediator = contentMediator;
 
+    if (!workspace) {
+      throw new Error('no workspace provided');
+    }
     /** @type {Workspace} */
     this.workspace = workspace;
+
+    if (!content) {
+      throw new Error('no panel content provided');
+    }
+    /** @type {*} */
+    this.content = content;
 
     /** @type {Panel~UpdateHandler} */
     this.updateHandler = updateHandler;
@@ -50,7 +66,7 @@ class Panel {
     /**
      * Visual display properties
      * @private
-     * @type {Object.<string,Object>}
+     * @type {Object.<string,*>}
      */
     this.vprops = {
       xPosition: 100,
@@ -114,7 +130,7 @@ class Panel {
    * Sets an arbitrary visual property on the panel.
    * Triggers update handler after property has been set.
    * @param {string} property
-   * @param {Object} [value]
+   * @param {*} [value]
    */
   set(property/*: string*/, value/*: any*/)/*: void*/ {
     this.setVisualProperties({ [property]: value });
@@ -123,7 +139,7 @@ class Panel {
   /**
    * Copies provided key/value pairs from provided object into panel visual properties
    * Triggers update handler after all properties have been set.
-   * @param {Object.<string,Object>} [props = {}]
+   * @param {Object.<string,*>} [props = {}]
    */
   setVisualProperties(props/*: { [key: string]: any }*/ = {})/*: void*/ {
     for (let prop in props) if (props.hasOwnProperty(prop)) {
@@ -138,7 +154,7 @@ class Panel {
   /**
    * Retrieves a specific named panel visual property.
    * @param {string} property
-   * @return {Object}
+   * @return {*}
    */
   get(property/*: string*/)/*: any*/ {
     return this.vprops[property];
@@ -147,7 +163,7 @@ class Panel {
   /**
    * Retrieves an object map containing all panel properties.
    * The returned object is a shallow copy of the underlying data structure.
-   * @return {Object.<string,Object>}
+   * @return {Object.<string,*>}
    */
   getVisualProperties()/*: { [key: string]: any }*/ {
     let clone = {};
