@@ -74,7 +74,7 @@ class WorkspaceRepository {
    * @param {string} id
    * @return {Promise.<Panel>}
    */
-  getPanel(/*:: workspace: Workspace, id: string*/)/*: Promise<Panel>*/ {
+  getPanel(/*:: workspaceId: string, panelId: string*/)/*: Promise<Panel>*/ {
     throw new Error('WorkspaceRepository#getPanel not implemented');
   }
 
@@ -137,7 +137,7 @@ class WorkspaceRepository {
     let ws = new Workspace(dto.id, this);
     ws.title = dto.title;
 
-    let panelPs = dto.panels.map(id => this.getPanel(ws, id).then((p) => ws.panels[id] = p));
+    let panelPs = dto.panels.map(id => this.getPanel(ws.id, id).then((p) => ws.panels[id] = p));
     return Promise.all(panelPs).then(() => ws);
   }
 }
