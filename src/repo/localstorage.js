@@ -127,8 +127,20 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    */
   savePanel(panel/*: Panel*/)/*: Promise<Panel>*/ {
     let dto = this.marshallPanel(panel);
-    localStorage.setItem(PANEL_PREFIX + panel.id, JSON.stringify(dto));
-    return Promise.resolve(panel);
+    let id = panel.id
+    localStorage.setItem(PANEL_PREFIX + id, JSON.stringify(dto));
+
+    let promise = Promise.resolve(panel);
+
+    if (this.panelIds.indexOf(id) < 0) {
+      // promise should not exist in cache since we've never seen this instance before
+      // if one does exist, we have problems... override that instance with the one we're saving
+      this._panelCache.fetch(id, promise);
+      this.panelIds.push(id);
+      this.sync();
+    }
+
+    return promise;
   }
 
   /**
@@ -154,6 +166,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
    */
   sync() {
     localStorage.setItem(WORKSPACE_IDS_KEY, JSON.stringify(this.workspaceIds));
+    localStorage.setItem(PANEL_IDS_KEY, JSON.stringify(this.panelIds));
   }
 
   /**
