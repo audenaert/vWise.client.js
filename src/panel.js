@@ -182,6 +182,14 @@ class Panel/*:: <T>*/ {
   remove()/*: void*/ {
     this.workspace.removePanel(this);
   }
+
+  /**
+   * Activates the panel in the workspace by raising it to the top of the panel stack.
+   * @see Workspace#activatePanel
+   */
+  activate()/*: void*/ {
+    this.workspace.activatePanel(this);
+  }
 }
 
 /**

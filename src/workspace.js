@@ -8,6 +8,7 @@ class Workspace {
   /*:: id: string;*/
   /*:: title: string;*/
   /*:: panels: {[key: string]: Panel};*/
+  /*:: panelStack: Panel[];*/
   /*:: repo: WorkspaceRepository;*/
 
   /**
@@ -27,8 +28,15 @@ class Workspace {
     /**@type {string} */
     this.title = 'Untitled';
 
-    /** @type {Object.<String,Panel>} */
+    /** @type {Object.<string,Panel>} */
     this.panels = {};
+
+    /**
+     * Z-ordering of panels, with the top of the stack at the highest index (end of array).
+     * If a panel is not a member of this list, then that panel is hidden or "minimized".
+     * @type {Panel[]}
+     */
+    this.panelStack = [];
   }
 
   /**
@@ -41,6 +49,7 @@ class Workspace {
 
     panelP.then((panel) => {
       this.panels[panel.id] = panel;
+      this.panelStack.push(panel);
     });
 
     return panelP;
@@ -54,6 +63,24 @@ class Workspace {
     if (this.panels.hasOwnProperty(panel.id)) {
       delete this.panels[panel.id];
       this.repo.saveWorkspace(this);
+    }
+
+    let ix = this.panelStack.indexOf(panel);
+    if (ix >= 0) {
+      this.panelStack.splice(ix, 1);
+    }
+  }
+
+  /**
+   * Activates a panel by moving it to the top of the stack
+   */
+  activatePanel(panel/*: Panel*/)/*: void*/ {
+    if (this.panels.hasOwnProperty(panel.id)) {
+      let ix = this.panelStack.indexOf(panel);
+      if (ix >= 0) {
+        this.panelStack.splice(ix, 1);
+      }
+      this.panelStack.push(panel);
     }
   }
 }
