@@ -59,7 +59,7 @@ describe('PanelContentMediator (base class)', function () {
   describe('#getTemplate', function () {
     it('should return an angular json serialization template by default', function () {
       let mediator = new PanelContentMediator('test');
-      mediator.getTemplate().should.equal('{{content|json}}');
+      mediator.getTemplate().should.equal('<pre>{{content|json}}</pre>');
     });
   });
 });

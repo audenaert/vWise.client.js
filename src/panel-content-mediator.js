@@ -79,7 +79,7 @@ class PanelContentMediator/*::<T>*/ {
    * @return {string}
    */
   getTemplate()/*: string*/ {
-    return '{{content|json}}';
+    return '<pre>{{content|json}}</pre>';
   }
 }
 
