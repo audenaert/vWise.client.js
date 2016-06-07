@@ -212,6 +212,14 @@ describe('Panel', function () {
       after.should.have.property('hello', 'world');
     })
   });
+
+  describe('#remove', function () {
+    it('should remove the panel from the workspace');
+  });
+
+  describe('#activate', function () {
+    it('should move the panel to the top of the panel stack in the workspace');
+  });
 });
 
 function noop() {}
