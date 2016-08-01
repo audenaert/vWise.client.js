@@ -34,6 +34,12 @@ class Workspace {
     /**
      * Z-ordering of panels, with the top of the stack at the highest index (end of array).
      * If a panel is not a member of this list, then that panel is hidden or "minimized".
+     *
+     * Note: This property should NOT be used in an ng-repeat directive since ng-repeat tends to
+     * destroy and recreate DOM elements when ordering changes, thereby resetting panel contents to
+     * an initial state. Use `panels` instead, and rely on the `panel.vprops.zPosition` for that
+     * panel's index in the stack.
+     *
      * @type {Panel[]}
      */
     this.panelStack = [];
@@ -49,6 +55,7 @@ class Workspace {
 
     panelP.then((panel) => {
       this.panels[panel.id] = panel;
+      panel.vprops.zPosition = this.panelStack.length;
       this.panelStack.push(panel);
     });
 
@@ -80,7 +87,12 @@ class Workspace {
       if (ix >= 0) {
         this.panelStack.splice(ix, 1);
       }
+
       this.panelStack.push(panel);
+
+      for (var i = 0; i < this.panelStack.length; i++) {
+        this.panelStack[i].vprops.zPosition = i;
+      }
     }
   }
 }
