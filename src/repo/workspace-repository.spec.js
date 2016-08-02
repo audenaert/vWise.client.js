@@ -44,7 +44,7 @@ describe('WorkspaceRepository', function () {
       let dto0 = repo.marshallPanel(panel0);
       let dto1 = JSON.parse(JSON.stringify(dto0));
 
-      return repo.unmarshallPanel(dto1).then(panel1 => {
+      return repo.unmarshallPanel(dto1, workspace).then(panel1 => {
         comparePanels(panel0, panel1);
         expect(repo.getWorkspace.called).to.be.true;
       });

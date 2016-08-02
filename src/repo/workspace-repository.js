@@ -82,10 +82,11 @@ class WorkspaceRepository {
   /**
    * Retrieves a saved panel within the provided workspace
    * @abstract
-   * @param {string} id
+   * @param {string} panelId
+   * @param {Workspace} workspace
    * @return {Promise.<Panel>}
    */
-  getPanel(/*:: workspaceId: string, panelId: string*/)/*: Promise<Panel>*/ {
+  getPanel(/*:: panelId: string, workspace: Workspace*/)/*: Promise<Panel>*/ {
     throw new Error('WorkspaceRepository#getPanel not implemented');
   }
 
@@ -121,14 +122,14 @@ class WorkspaceRepository {
   /**
    * Repopulates panel data from a marshalled DTO.
    * @param  {Object} dto
+   * @param  {Workspace} workspace
    * @return {Promise.<Panel>}
    */
-  unmarshallPanel(dto/*: Object*/)/*: Promise<Panel>*/ {
+  unmarshallPanel(dto/*: Object*/, workspace/*: Workspace*/)/*: Promise<Panel>*/ {
     let mediator = this.mediatorRegistry.getMediator(dto.mediatorId);
-    let workspaceP = this.getWorkspace(dto.workspaceId);
     let contentP = mediator.unmarshall(dto.content);
 
-    let panelP = Promise.all([workspaceP, contentP]).then(([workspace, content]) => {
+    let panelP = contentP.then(content => {
       let panel = new Panel(dto.id, mediator, workspace, content, dto.vprops, p => { this.savePanel(p); });
       return panel;
     });

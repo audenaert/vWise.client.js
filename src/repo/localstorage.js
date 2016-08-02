@@ -162,7 +162,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /**
    * @inheritdoc
    */
-  getPanel(workspaceId/*: string*/, panelId/*: string*/)/*: Promise<Panel>*/ {
+  getPanel(panelId/*: string*/, workspace/*: Workspace*/)/*: Promise<Panel>*/ {
     return this._panelCache.fetch(panelId, () => {
       let json = localStorage.getItem(PANEL_PREFIX + panelId);
 
@@ -171,7 +171,7 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
       }
 
       let dto = JSON.parse(json);
-      let panelP = this.unmarshallPanel(dto);
+      let panelP = this.unmarshallPanel(dto, workspace);
       panelP.catch(() => this._panelCache.clear(panelId));
       return panelP;
     });
