@@ -159,8 +159,11 @@ class WorkspaceRepository {
     let ws = new Workspace(dto.id, this);
     ws.title = dto.title;
 
-    let panelPs = dto.panels.map(id => this.getPanel(ws.id, id).then((p) => ws.panels[id] = p));
-    return Promise.all(panelPs).then(() => ws);
+    let panelPs = dto.panels.map(id => this.getPanel(id, ws));
+    return Promise.all(panelPs).then(panels => {
+      panels.forEach(p => ws.pushPanel(p));
+      return ws;
+    });
   }
 }
 

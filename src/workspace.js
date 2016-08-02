@@ -55,13 +55,22 @@ class Workspace {
   createPanel/*:: <T>*/(contentMediator/*: PanelContentMediator*/, panelContent/*: T*/, vprops/*: ?{ [key: string]: string }*/)/*: Promise<Panel<T>>*/ {
     let panelP = this.repo.createPanel(contentMediator, this, panelContent, vprops);
 
-    panelP.then((panel) => {
-      this.panels[panel.id] = panel;
-      panel.vprops.zPosition = this.panelStack.length;
-      this.panelStack.push(panel);
+    panelP.then(panel => {
+      this.pushPanel(panel);
+      this.repo.saveWorkspace(this);
     });
 
     return panelP;
+  }
+
+  /**
+   * Adds a panel to the workspace, taking care of stack position bookkeeping
+   * @param {Panel} panel
+   */
+  pushPanel(panel/*: Panel*/)/*: void*/ {
+    this.panels[panel.id] = panel;
+    panel.vprops.zPosition = this.panelStack.length;
+    this.panelStack.push(panel);
   }
 
   /**
