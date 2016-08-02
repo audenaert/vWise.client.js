@@ -146,7 +146,7 @@ class WorkspaceRepository {
     return {
       id: workspace.id,
       title: workspace.title,
-      panels: Object.keys(workspace.panels)
+      panels: workspace.panelStack.map(p => p.id)
     };
   }
 
