@@ -69,14 +69,31 @@ class Workspace {
    * @param {Panel} panel
    */
   removePanel(panel/*: Panel*/)/*: void*/ {
+    var queuePersist = false;
+
     if (this.panels.hasOwnProperty(panel.id)) {
       delete this.panels[panel.id];
-      this.repo.saveWorkspace(this);
+      this.repo.removePanel(panel, this);
+
+      queuePersist = true;
     }
 
     let ix = this.panelStack.indexOf(panel);
     if (ix >= 0) {
       this.panelStack.splice(ix, 1);
+
+      while (ix < this.panelStack.length) {
+        let panel = this.panelStack[ix];
+        panel.vprops.zPosition = ix;
+        this.repo.savePanel(panel);
+        ix++;
+      }
+
+      queuePersist = true;
+    }
+
+    if (queuePersist) {
+      this.repo.saveWorkspace(this);
     }
   }
 
@@ -92,9 +109,14 @@ class Workspace {
 
       this.panelStack.push(panel);
 
-      for (var i = 0; i < this.panelStack.length; i++) {
-        this.panelStack[i].vprops.zPosition = i;
+      while (ix < this.panelStack.length) {
+        let panel = this.panelStack[ix];
+        panel.vprops.zPosition = ix;
+        this.repo.savePanel(panel);
+        ix++;
       }
+
+      this.repo.saveWorkspace(this);
     }
   }
 }
