@@ -33,9 +33,11 @@ class Panel/*:: <T>*/ {
    * @param {PanelContentMediator} contentMediator
    * @param {Workspace} workspace
    * @param {*} content
+   * @param {Object} [vprops]
+   * @param {Function} [updateHandler]
    * @return {Workspace}
    */
-  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, content/*: T*/, updateHandler/*: ?(panel: Panel<T>) => void*/) {
+  constructor(id/*: string */, contentMediator/*: PanelContentMediator*/, workspace/*: Workspace*/, content/*: T*/, vprops/*: ?{ [key: string]: any }*/, updateHandler/*: ?(panel: Panel<T>) => void*/) {
     if (!id) {
       throw new Error('no id provided');
     }
@@ -81,6 +83,12 @@ class Panel/*:: <T>*/ {
       fontSize: '',
       fontWeight: '',
       style: ''
+    };
+
+    if (vprops) {
+      for (let prop of Object.keys(vprops)) {
+        this.vprops[prop] = vprops[prop];
+      }
     }
   }
 

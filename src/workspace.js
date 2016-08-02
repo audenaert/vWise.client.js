@@ -48,10 +48,12 @@ class Workspace {
   /**
    * Instantiates a new panel of the given type definition
    * @param {PanelContentMediator} contentMediator
+   * @param {Object} panelContent
+   * @param {Object} [vprops]
    * @return {Promise.<Panel>}
    */
-  createPanel/*:: <T>*/(contentMediator/*: PanelContentMediator*/, panelContent/*: T*/)/*: Promise<Panel<T>>*/ {
-    let panelP = this.repo.createPanel(contentMediator, this, panelContent);
+  createPanel/*:: <T>*/(contentMediator/*: PanelContentMediator*/, panelContent/*: T*/, vprops/*: ?{ [key: string]: string }*/)/*: Promise<Panel<T>>*/ {
+    let panelP = this.repo.createPanel(contentMediator, this, panelContent, vprops);
 
     panelP.then((panel) => {
       this.panels[panel.id] = panel;
