@@ -113,6 +113,22 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /**
    * @inheritdoc
    */
+  removeWorkspace(workspace/*: Workspace*/)/*: Promise*/ {
+    this._workspaceCache.clear(workspace.id);
+    localStorage.removeItem(WORKSPACE_PREFIX + workspace.id);
+
+    let ix = this.workspaceIds.indexOf(workspace.id);
+    if (ix >= 0) {
+      this.workspaceIds.splice(ix, 1);
+    }
+    this.sync();
+
+    return Promise.resolve();
+  }
+
+  /**
+   * @inheritdoc
+   */
   createPanel/*:: <T>*/(mediator/*: PanelContentMediator*/, workspace/*: Workspace*/, panelContent/*: T*/, vprops/*: ?{ [key: string]: any }*/)/*: Promise<Panel<T>>*/ {
     let id = UUID.uuid4();
     let panel = new Panel(id, mediator, workspace, panelContent, vprops, () => { this.savePanel(panel) });
@@ -159,6 +175,30 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
       panelP.catch(() => this._panelCache.clear(panelId));
       return panelP;
     });
+  }
+
+  /**
+   * @inheritdoc
+   */
+  removePanel(panel/*: Panel*/, workspace/*: Workspace*/)/*: Promise*/ {
+    if (!panel) {
+      throw new TypeError('no panel id provided');
+    }
+
+    if (workspace) {
+      workspace.removePanel(panel);
+    }
+
+    this._panelCache.clear(panel.id);
+    localStorage.removeItem(PANEL_PREFIX + panel.id);
+
+    let ix = this.panelIds.indexOf(panel.id);
+    if (ix >= 0) {
+      this.panelIds.splice(ix, 1);
+    }
+    this.sync();
+
+    return Promise.resolve();
   }
 
   /**

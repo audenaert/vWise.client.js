@@ -47,6 +47,16 @@ class WorkspaceRepository {
   }
 
   /**
+   * Removes a saved workspace
+   * @abstract
+   * @param {string} id
+   * @return {Promise}
+   */
+  removeWorkspace(/*:: workspace: Workspace*/)/*: Promise*/ {
+    throw new Error('WorkspaceRepository#removeWorkspace not implemented');
+  }
+
+  /**
    * Creates and saves a new panel instance
    * @abstract
    * @param {string} id
@@ -77,6 +87,17 @@ class WorkspaceRepository {
    */
   getPanel(/*:: workspaceId: string, panelId: string*/)/*: Promise<Panel>*/ {
     throw new Error('WorkspaceRepository#getPanel not implemented');
+  }
+
+  /**
+   * Removes a saved panel
+   * @abstract
+   * @param {string} id
+   * @param {Workspace} workspace
+   * @return {Promise}
+   */
+  removePanel(/*:: panel: Panel, workspace: Workspace*/)/*: Promise*/ {
+    throw new Error('WorkspaceRepository#removePanel not implemented');
   }
 
   /**
