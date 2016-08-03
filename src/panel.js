@@ -154,9 +154,7 @@ class Panel/*:: <T>*/ {
       this.vprops[prop] = props[prop];
     }
 
-    if (this.updateHandler) {
-      this.updateHandler(this);
-    }
+    this.save();
   }
 
   /**
@@ -197,6 +195,15 @@ class Panel/*:: <T>*/ {
    */
   activate()/*: void*/ {
     this.workspace.activatePanel(this);
+  }
+
+  /**
+   * Notifies the update handler of potential updates to this panel.
+   */
+  save()/*: void*/ {
+    if (this.updateHandler) {
+      this.updateHandler(this);
+    }
   }
 }
 
