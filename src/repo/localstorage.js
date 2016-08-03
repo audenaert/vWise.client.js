@@ -60,6 +60,13 @@ class LocalStorageWorkspaceRepository extends WorkspaceRepository {
   /**
    * @inheritdoc
    */
+  listWorkspaceIds()/*: Promise<string[]>*/ {
+    return Promise.resolve(this.workspaceIds);
+  }
+
+  /**
+   * @inheritdoc
+   */
   createWorkspace(title/*: ?string */ = null)/*: Promise<Workspace>*/ {
     let id = UUID.uuid4();
     let workspace = new Workspace(id, this);

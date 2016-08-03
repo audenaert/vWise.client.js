@@ -17,8 +17,16 @@ class WorkspaceRepository {
   }
 
   /**
+   * Retrieves a list of all workspace ids.
+   * @abstract
+   * @return {Promise.<string[]>}
+   */
+  listWorkspaceIds()/*: Promise<string[]>*/ {
+    throw new Error('WorkspaceRepository#listWorkspaceIds not implemented');
+  }
+
+  /**
    * Creates a new workspace and persists it to the underlying storage mechanism.
-   * The $promise property on the returned Workspace will resolve to the Workspace once it has been saved.
    * @abstract
    * @return {Promise.<Workspace>}
    */
