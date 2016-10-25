@@ -1,6 +1,6 @@
 {
   "name": "vwise",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "in-browser panels-based workspace with support for custom content providers and rendering",
   "keywords": [
     "vwise",

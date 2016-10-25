@@ -46,7 +46,7 @@ const workspace = new Workspace('test-workspace', dummyRepo);
 describe('Panel', function () {
   describe('#constructor', function () {
     it('should populate values correctly', function () {
-      let panel = new Panel('test', mediator, workspace, panelContent, noop);
+      let panel = new Panel('test', mediator, workspace, panelContent, {}, noop);
       panel.id.should.equal('test');
       panel.contentMediator.should.deep.equal(mediator);
       panel.workspace.should.deep.equal(workspace);
@@ -61,7 +61,7 @@ describe('Panel', function () {
 
     beforeEach(function () {
       spy = sinon.spy();
-      panel = new Panel('test', mediator, workspace, panelContent, spy);
+      panel = new Panel('test', mediator, workspace, panelContent, {}, spy);
     });
 
     it('should set the width and height properties', function () {
@@ -74,12 +74,12 @@ describe('Panel', function () {
 
     it('should trigger a call to the update handler', function () {
       panel.setSize(123, 456);
-      spy.called.should.be.true;
+      expect(spy.called).to.be.true;
     });
   });
 
   describe('#getSize', function () {
-    let panel = new Panel('test', mediator, workspace, panelContent, noop);
+    let panel = new Panel('test', mediator, workspace, panelContent, {}, noop);
 
     it('should get the width and height properties', function () {
       let size = panel.getSize();
@@ -95,7 +95,7 @@ describe('Panel', function () {
 
     beforeEach(function () {
       spy = sinon.spy();
-      panel = new Panel('test', mediator, workspace, panelContent, spy);
+      panel = new Panel('test', mediator, workspace, panelContent, {}, spy);
     });
 
     it('should set the x and y position properties', function () {
@@ -113,7 +113,7 @@ describe('Panel', function () {
   });
 
   describe('#getPosition', function () {
-    let panel = new Panel('test', mediator, workspace, panelContent, noop);
+    let panel = new Panel('test', mediator, workspace, panelContent, {}, noop);
 
     it('should get the x and y position properties', function () {
       let position = panel.getPosition();
@@ -129,7 +129,7 @@ describe('Panel', function () {
 
     beforeEach(function () {
       spy = sinon.spy();
-      panel = new Panel('test', mediator, workspace, panelContent, spy);
+      panel = new Panel('test', mediator, workspace, panelContent, {}, spy);
     });
 
     it('should set arbitrary properties', function () {
@@ -151,7 +151,7 @@ describe('Panel', function () {
 
     beforeEach(function () {
       spy = sinon.spy();
-      panel = new Panel('test', mediator, workspace, panelContent, spy);
+      panel = new Panel('test', mediator, workspace, panelContent, {}, spy);
     });
 
     it('should set arbitrary properties', function () {
@@ -179,7 +179,7 @@ describe('Panel', function () {
   });
 
   describe('#get', function () {
-    let panel = new Panel('test', mediator, workspace, panelContent, noop);
+    let panel = new Panel('test', mediator, workspace, panelContent, {}, noop);
 
     it('should get a properties that were previously set', function () {
       panel.set('hello', 'world');
@@ -194,7 +194,7 @@ describe('Panel', function () {
     let panel;
 
     beforeEach(function () {
-      panel = new Panel('test', mediator, workspace, panelContent, noop);
+      panel = new Panel('test', mediator, workspace, panelContent, {}, noop);
     });
 
     it('should return all display properties', function () {
