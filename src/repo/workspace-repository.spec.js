@@ -36,8 +36,6 @@ describe('WorkspaceRepository', function () {
   describe('#unmarshallPanel', function () {
     it('should repopulate a panel instance with serialized values', function () {
       // unmarshalling a panel calls WorkspaceRepository#getWorkspace
-      sinon.stub(repo, 'getWorkspace').returns(Promise.resolve(workspace));
-
       let panel0 = new Panel('test', mediator, workspace, { hello: 'world' });
       panel0.set('hello', 'world');
 
@@ -46,7 +44,6 @@ describe('WorkspaceRepository', function () {
 
       return repo.unmarshallPanel(dto1, workspace).then(panel1 => {
         comparePanels(panel0, panel1);
-        expect(repo.getWorkspace.called).to.be.true;
       });
     });
   });
